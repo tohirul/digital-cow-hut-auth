@@ -1,32 +1,21 @@
-'use strict';
-var __importDefault =
-  (this && this.__importDefault) ||
-  function (mod) {
-    return mod && mod.__esModule ? mod : { default: mod };
-  };
-Object.defineProperty(exports, '__esModule', { value: true });
-const express_1 = __importDefault(require('express'));
-const cow_controller_1 = __importDefault(require('./cow.controller'));
-const ValidateRequest_1 = __importDefault(
-  require('../../middlewares/ValidateRequest'),
-);
-const cow_validation_1 = __importDefault(require('./cow.validation'));
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const cow_controller_1 = __importDefault(require("./cow.controller"));
+const ValidateRequest_1 = __importDefault(require("../../middlewares/ValidateRequest"));
+const cow_validation_1 = __importDefault(require("./cow.validation"));
+const Authorization_1 = __importDefault(require("../../middlewares/Authorization"));
+const enums_1 = require("../../../enums/enums");
+const AuthorizedSeller_1 = __importDefault(require("../../middlewares/AuthorizedSeller"));
 const router = express_1.default.Router();
-router.post(
-  '/',
-  (0, ValidateRequest_1.default)(cow_validation_1.default.cowProfileZodSchema),
-  cow_controller_1.default.createCowProfile,
-);
-router.get('/', cow_controller_1.default.getAllCowProfile);
-router.get('/:id', cow_controller_1.default.getCowProfile);
-router.patch(
-  '/:id',
-  (0, ValidateRequest_1.default)(
-    cow_validation_1.default.cowProfileUpdateZodSchema,
-  ),
-  cow_controller_1.default.updateCowProfile,
-);
-router.delete('/:id', cow_controller_1.default.deleteCowProfile);
+router.post('/', (0, ValidateRequest_1.default)(cow_validation_1.default.cowProfileZodSchema), (0, Authorization_1.default)(enums_1.USER_ROLE.SELLER), cow_controller_1.default.createCowProfile);
+router.get('/', (0, Authorization_1.default)(enums_1.USER_ROLE.ADMIN, enums_1.USER_ROLE.BUYER, enums_1.USER_ROLE.SELLER), cow_controller_1.default.getAllCowProfile);
+router.get('/:id', (0, Authorization_1.default)(enums_1.USER_ROLE.SELLER, enums_1.USER_ROLE.ADMIN, enums_1.USER_ROLE.BUYER), (0, AuthorizedSeller_1.default)(), cow_controller_1.default.getCowProfile);
+router.patch('/:id', (0, ValidateRequest_1.default)(cow_validation_1.default.cowProfileUpdateZodSchema), (0, Authorization_1.default)(enums_1.USER_ROLE.SELLER), (0, AuthorizedSeller_1.default)(), cow_controller_1.default.updateCowProfile);
+router.delete('/:id', (0, Authorization_1.default)(enums_1.USER_ROLE.SELLER), cow_controller_1.default.deleteCowProfile);
 const CowRoutes = router;
 exports.default = CowRoutes;
 /*
