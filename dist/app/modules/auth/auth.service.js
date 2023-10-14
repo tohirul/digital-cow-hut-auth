@@ -41,16 +41,29 @@ const SignUp = async (payload) => {
     }
     return user;
 };
+/**
+ * Authenticates user credentials and generates access and refresh tokens upon successful login.
+ * @function
+ * @param {ILoginData} payload - User login credentials (phoneNumber, password).
+ * @returns {Promise<ILoginResponse>} - A Promise that resolves to an object containing access and refresh tokens.
+ * @throws {ApiError} - If user profile is not found or if provided password does not match the stored password,
+ * an ApiError with appropriate status and message is thrown.
+ */
 const loginUser = async (payload) => {
+    // Extract phoneNumber and password from the login payload
     const { phoneNumber, password } = payload;
+    // Create a new User instance and check if the user profile exists
     const user = new user_model_1.default();
     const isExisting = await user.findExistingByPhone(phoneNumber);
+    // If user profile is not found, throw an error
     if (!isExisting)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User profile not found, please try again!');
+    // If provided password does not match the stored password, throw an error
     if (isExisting.password && !user.passwordMatch(password, isExisting.password))
         throw new ApiError_1.default(http_status_1.default.NOT_ACCEPTABLE, 'Phone Number and Password do not match');
+    // Extract user ID and role from the existing user profile
     const { _id: userID, role: userRole } = isExisting;
-    // * Access Token and Refresh Token
+    // Generate access token and refresh token using JWTHelper methods
     const accessToken = jwt_helper_1.default.createToken({
         id: userID,
         role: userRole,
@@ -59,6 +72,7 @@ const loginUser = async (payload) => {
         id: userID,
         role: userRole,
     }, config_1.default.jwt.jwt_refresh_token_key, config_1.default.jwt.jwt_refresh_token_expires_in);
+    // Return an object containing access and refresh tokens
     return {
         accessToken,
         refreshToken,

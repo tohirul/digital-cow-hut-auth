@@ -89,23 +89,42 @@ const deleteUser = async (userId) => {
         await session.endSession();
     }
 };
+/**
+ * Retrieves the user's profile based on the provided authorization token.
+ * @function
+ * @param {string} token - User's authorization token for authentication and verification.
+ * @returns {Promise<Partial<IUser> | null>} - A Promise that resolves to the user's profile data or null if the user is not found.
+ */
 const getMyProfile = (token) => {
+    // Verify the provided token to obtain user's ID
     const verifiedData = jwt_helper_1.default.verifyToken(token, config_1.default.jwt.jwt_access_token_key);
     const { id } = verifiedData;
+    // Retrieve user's profile data based on the verified user ID
     return user_model_1.default.findById({ _id: id }, { name: 1, phoneNumber: 1, address: 1 });
 };
+/**
+ * Updates the user's profile based on the provided authorization token and payload data.
+ * @function
+ * @param {string} token - User's authorization token for authentication and verification.
+ * @param {IUser} payload - Updated user profile data.
+ * @returns {Promise<Partial<IUser> | null>} - A Promise that resolves to the updated user's profile data or null if the user is not found.
+ */
 const updateMyProfile = async (token, payload) => {
+    // Verify the provided token to obtain user's ID
     const verifiedData = jwt_helper_1.default.verifyToken(token, config_1.default.jwt.jwt_access_token_key);
     const { id } = verifiedData;
+    // Extract and process updated data from the payload
     const { name, ...userData } = payload;
     let updatedData = { ...userData };
+    // Embed updated name data if available in the payload
     if (name && Object.keys(name).length) {
         updatedData = (0, user_embed_1.default)(name, updatedData, 'name');
     }
+    // Hash and update password if provided in the payload
     if (payload?.password) {
-        console.log(payload.password);
         updatedData.password = await bcrypt_1.default.hash(payload.password, Number(config_1.default.bcrypt_salt_rounds));
     }
+    // Update user's profile data based on the verified user ID and updated data
     return await user_model_1.default.findOneAndUpdate({ _id: id }, updatedData, {
         new: true,
     })

@@ -81,9 +81,19 @@ const deleteUser = (0, catchAsync_1.default)(async (req, res) => {
         data: result,
     });
 });
+/**
+ * Retrieves the user's profile based on the provided authorization token.
+ * @function
+ * @param {Request} req - Express Request object containing user's authorization token in the headers.
+ * @param {Response} res - Express Response object for sending the user's profile data in the response.
+ * @returns {Promise<void>} - A Promise that resolves when the user's profile is successfully retrieved and sent in the response.
+ */
 const getMyProfile = (0, catchAsync_1.default)(async (req, res) => {
+    // Extract the authorization token from the request headers
     const token = req.headers.authorization;
+    // Call the UserService method to retrieve user's profile based on the provided token
     const result = await user_service_1.default.getMyProfile(token);
+    // Send the user's profile data in the response
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -91,10 +101,21 @@ const getMyProfile = (0, catchAsync_1.default)(async (req, res) => {
         data: result,
     });
 });
+/**
+ * Updates the user's profile based on the provided authorization token and updated data.
+ * @function
+ * @param {Request} req - Express Request object containing user's authorization token in the headers and updated data in the body.
+ * @param {Response} res - Express Response object for sending the updated user's profile data in the response.
+ * @returns {Promise<void>} - A Promise that resolves when the user's profile is successfully updated and sent in the response.
+ */
 const updateMyProfile = (0, catchAsync_1.default)(async (req, res) => {
+    // Extract the authorization token from the request headers
     const token = req.headers.authorization;
+    // Extract updated data from the request body
     const updatedData = req.body;
+    // Call the UserService method to update user's profile based on the provided token and updated data
     const result = await user_service_1.default.updateMyProfile(token, updatedData);
+    // Send the updated user's profile data in the response
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
