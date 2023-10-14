@@ -115,7 +115,7 @@ const verifyRefreshToken = async (
   } catch (error) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Invalid Credentials');
   }
-  console.log(verifiedData);
+  // console.log(verifiedData);
   const { id, role } = verifiedData;
 
   let isExisting;

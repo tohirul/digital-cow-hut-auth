@@ -115,13 +115,13 @@ const getAllOrder = async (filter: IAuthFilter): Promise<IOrder[]> => {
     orders = allOrders.filter(order => {
       const cow = order.cow as ICow;
       const seller = cow.seller;
-      console.log(`COW: ${cow} SELLER: ${seller}`);
+      // console.log(`COW: ${cow} SELLER: ${seller}`);
       return (
         seller._id &&
         seller._id.toString() === (filter.seller as ObjectId).toString()
       );
     });
-    console.log('orders: ', orders);
+    // console.log('orders: ', orders);
   } else {
     const condition = {};
     orders = await Order.find(condition)
