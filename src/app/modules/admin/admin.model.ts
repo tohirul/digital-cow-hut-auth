@@ -4,11 +4,11 @@ import bcrypt from 'bcrypt';
 import config from '../../../config';
 
 const AdminSchema = new Schema<IAdmin, Record<string, unknown>, IAdminMethods>(
-  { 
+  {
     phoneNumber: {
-    type: String,
-    required: true,
-    unique: true,
+      type: String,
+      required: true,
+      unique: true,
     },
     role: {
       type: String,
@@ -30,7 +30,7 @@ const AdminSchema = new Schema<IAdmin, Record<string, unknown>, IAdminMethods>(
         required: true,
       },
     },
-   
+
     address: {
       type: String,
       required: true,
@@ -53,15 +53,15 @@ AdminSchema.methods.passwordMatch = async function (
 
 AdminSchema.methods.findExistingById = async function (
   property: string,
-): Promise<IAdmin|null> {
-  const result = await Admin.findById({_id: property});
+): Promise<IAdmin | null> {
+  const result = await Admin.findById({ _id: property });
   return result;
 };
 
 AdminSchema.methods.findExistingByPhone = async function (
   property: string,
-): Promise<IAdmin|null> {
-  const result = await Admin.findOne({phoneNumber: property});
+): Promise<IAdmin | null> {
+  const result = await Admin.findOne({ phoneNumber: property });
   return result;
 };
 

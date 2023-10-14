@@ -91,10 +91,21 @@ const deleteUser = catchAsync(
   },
 );
 
+/**
+ * Retrieves the user's profile based on the provided authorization token.
+ * @function
+ * @param {Request} req - Express Request object containing user's authorization token in the headers.
+ * @param {Response} res - Express Response object for sending the user's profile data in the response.
+ * @returns {Promise<void>} - A Promise that resolves when the user's profile is successfully retrieved and sent in the response.
+ */
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
+  // Extract the authorization token from the request headers
   const token = req.headers.authorization;
+
+  // Call the UserService method to retrieve user's profile based on the provided token
   const result = await UserService.getMyProfile(token as string);
 
+  // Send the user's profile data in the response
   sendResponse<Partial<IUser>>(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -103,14 +114,27 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Updates the user's profile based on the provided authorization token and updated data.
+ * @function
+ * @param {Request} req - Express Request object containing user's authorization token in the headers and updated data in the body.
+ * @param {Response} res - Express Response object for sending the updated user's profile data in the response.
+ * @returns {Promise<void>} - A Promise that resolves when the user's profile is successfully updated and sent in the response.
+ */
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  // Extract the authorization token from the request headers
   const token = req.headers.authorization;
+
+  // Extract updated data from the request body
   const updatedData = req.body;
+
+  // Call the UserService method to update user's profile based on the provided token and updated data
   const result = await UserService.updateMyProfile(
     token as string,
     updatedData,
   );
 
+  // Send the updated user's profile data in the response
   sendResponse<Partial<IUser>>(res, {
     statusCode: httpStatus.OK,
     success: true,

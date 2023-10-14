@@ -97,41 +97,60 @@ const deleteUser = async (userId: string): Promise<IUser | null> => {
     await session.endSession();
   }
 };
-
+/**
+ * Retrieves the user's profile based on the provided authorization token.
+ * @function
+ * @param {string} token - User's authorization token for authentication and verification.
+ * @returns {Promise<Partial<IUser> | null>} - A Promise that resolves to the user's profile data or null if the user is not found.
+ */
 const getMyProfile = (token: string): Promise<Partial<IUser> | null> => {
+  // Verify the provided token to obtain user's ID
   const verifiedData = JWTHelpers.verifyToken(
     token,
     config.jwt.jwt_access_token_key as Secret,
   );
   const { id } = verifiedData;
 
+  // Retrieve user's profile data based on the verified user ID
   return User.findById({ _id: id }, { name: 1, phoneNumber: 1, address: 1 });
 };
 
+/**
+ * Updates the user's profile based on the provided authorization token and payload data.
+ * @function
+ * @param {string} token - User's authorization token for authentication and verification.
+ * @param {IUser} payload - Updated user profile data.
+ * @returns {Promise<Partial<IUser> | null>} - A Promise that resolves to the updated user's profile data or null if the user is not found.
+ */
 const updateMyProfile = async (
   token: string,
   payload: IUser,
 ): Promise<Partial<IUser> | null> => {
+  // Verify the provided token to obtain user's ID
   const verifiedData = JWTHelpers.verifyToken(
     token,
     config.jwt.jwt_access_token_key as Secret,
   );
   const { id } = verifiedData;
+
+  // Extract and process updated data from the payload
   const { name, ...userData } = payload;
   let updatedData: Partial<IUser> = { ...userData };
 
+  // Embed updated name data if available in the payload
   if (name && Object.keys(name).length) {
     updatedData = embed(name, updatedData, 'name');
   }
 
+  // Hash and update password if provided in the payload
   if (payload?.password) {
-    console.log(payload.password);
     updatedData.password = await bcrypt.hash(
       payload.password,
       Number(config.bcrypt_salt_rounds),
     );
   }
 
+  // Update user's profile data based on the verified user ID and updated data
   return await User.findOneAndUpdate({ _id: id }, updatedData, {
     new: true,
   })

@@ -7,14 +7,17 @@ import { ILoginData, ILoginResponse } from '../../../types/common.type';
 import JWTHelpers from '../../../helpers/jwt.helper';
 import config from '../../../config';
 import { Secret } from 'jsonwebtoken';
+
+/**
+ * Creates a new admin profile in the database.
+ *
+ * @param {IAdmin} payload - Admin data to be stored in the database.
+ * @returns {Promise<Partial<IAdmin> | null>} - Promise resolving to the created admin profile or null if creation fails.
+ * @throws {ApiError} - If admin creation fails, an ApiError with appropriate status and message is thrown.
+ */
 const createAdmin = async (
   payload: IAdmin,
 ): Promise<Partial<IAdmin> | null> => {
-  // // * Encrypting Password using bcrypt
-  // const encryptedPassword = await bcrypt.hash(payload.password,
-  //   Number(config.bcrypt_salt_rounds));
-  // payload.password = encryptedPassword;
-
   let createdAdmin;
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -36,6 +39,14 @@ const createAdmin = async (
   return await Admin.findById({ _id: createdAdmin._id });
 };
 
+/**
+ * Handles the admin login functionality.
+ *
+ * @param {ILoginData} payload - Admin login credentials (phoneNumber, password).
+ * @returns {Promise<ILoginResponse>} - Promise resolving to an object containing access and refresh tokens.
+ * @throws {ApiError} - If admin profile is not found or if provided password does not match the stored password,
+ * an ApiError with appropriate status and message is thrown.
+ */
 const adminLogin = async (payload: ILoginData): Promise<ILoginResponse> => {
   const { phoneNumber, password } = payload;
 
@@ -59,6 +70,7 @@ const adminLogin = async (payload: ILoginData): Promise<ILoginResponse> => {
 
   const { _id, role } = isExisting;
 
+  // Create JWT tokens for authentication
   const accessToken = JWTHelpers.createToken(
     {
       id: _id,
@@ -80,8 +92,12 @@ const adminLogin = async (payload: ILoginData): Promise<ILoginResponse> => {
   return { accessToken, refreshToken };
 };
 
+/**
+ * AdminService object containing methods for admin profile creation and login.
+ */
 const AdminService = {
   createAdmin,
   adminLogin,
 };
+
 export default AdminService;
